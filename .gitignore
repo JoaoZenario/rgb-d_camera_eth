@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+data/
+*.blend1
+outputs/
+*.npy
+*.exr
+.ipynb_checkpoints/
