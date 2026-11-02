@@ -3,6 +3,7 @@ import h5py
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+import glob
 
 # Load rendered data
 file_path = "outputs/manufacturing_scene/0.hdf5"
@@ -52,14 +53,27 @@ for ax in axes:
 
 os.makedirs("report/figures", exist_ok=True)
 
+# Find existing figures
+existing = glob.glob(
+    "report/figures/manufacturing_scene_overview_*.png"
+)
+
+# Generate next figure number
+figure_number = len(existing) + 1
+
+filename = (
+    f"report/figures/manufacturing_scene_overview_"
+    f"{figure_number:03d}.png"
+)
+
 plt.tight_layout()
 
 plt.savefig(
-    "report/figures/manufacturing_scene_overview.png",
+    filename,
     dpi=200,
     bbox_inches="tight"
 )
 
 plt.show()
 
-print("Figure saved to report/figures/manufacturing_scene_overview.png")
+print(f"Figure saved to: {filename}")
