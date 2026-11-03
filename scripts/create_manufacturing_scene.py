@@ -2,6 +2,7 @@ import blenderproc as bproc
 import numpy as np
 import time
 import os
+import json
 
 # ============================================================
 # 1. INITIALISE BLENDERPROC
@@ -100,13 +101,13 @@ create_box(
 # 5. HORIZONTAL ALUMINIUM EXTRUSION
 # ============================================================
 
-# Main extrusion body
-create_box(
+# Main extrusion body: reserved category ID 4 for pose estimation
+horizontal_extrusion = create_box(
     name="horizontal_extrusion",
     location=[0, 0, 0.12],
     scale=[0.65, 0.04, 0.04],
     material=aluminium,
-    category_id=2
+    category_id=4
 )
 
 # Two grooves on the top face
@@ -211,22 +212,69 @@ light.set_energy(250)
 light.set_color([1.0, 1.0, 1.0])
 
 # ============================================================
-# 9. CAMERA
+# 9. CAMERA — PROVISIONAL D455-INFORMED INTRINSICS
 # ============================================================
 
-bproc.camera.set_resolution(640, 480)
+WIDTH = 640
+HEIGHT = 360
 
-print(
-    "Camera intrinsic matrix:\n",
-    bproc.camera.get_intrinsics_as_K_matrix()
+# Approximate D455 depth field of view:
+# horizontal: 86 degrees
+# vertical:   57 degrees
+#
+# These are specification-informed synthetic intrinsics,
+# NOT a physical calibration of a particular D455 unit.
+
+HFOV_DEG = 86.0
+VFOV_DEG = 57.0
+
+fx = WIDTH / (2.0 * np.tan(np.deg2rad(HFOV_DEG / 2.0)))
+fy = HEIGHT / (2.0 * np.tan(np.deg2rad(VFOV_DEG / 2.0)))
+
+cx = (WIDTH - 1) / 2.0
+cy = (HEIGHT - 1) / 2.0
+
+K = np.array([
+    [fx, 0.0, cx],
+    [0.0, fy, cy],
+    [0.0, 0.0, 1.0]
+])
+
+bproc.camera.set_resolution(WIDTH, HEIGHT)
+bproc.camera.set_intrinsics_from_K_matrix(
+    K,
+    WIDTH,
+    HEIGHT
+)
+
+print("\nCamera intrinsic matrix:")
+print(K)
+
+camera_location = np.array([0.85, -1.25, 0.85])
+look_at = np.array([0.0, 0.0, 0.20])
+
+# BlenderProc camera convention: local camera forward is -Z.
+forward_vec = look_at - camera_location
+
+rotation_matrix = bproc.camera.rotation_from_forward_vec(
+    forward_vec
 )
 
 camera_pose = bproc.math.build_transformation_mat(
-    [1.5, -2.0, 1.4],
-    [1.15, 0.0, 0.65]
+    camera_location,
+    rotation_matrix
 )
 
 bproc.camera.add_camera_pose(camera_pose)
+
+print("\nCamera location:", camera_location)
+print("Camera look-at target:", look_at)
+print("Camera forward vector:", forward_vec)
+print("Camera rotation matrix:")
+print(rotation_matrix)
+
+print("\nCamera pose:")
+print(camera_pose)
 
 # ============================================================
 # 10. RENDER SETTINGS
@@ -293,3 +341,36 @@ print(
 )
 
 print("\nImproved manufacturing scene completed!")
+
+# ============================================================
+# 14. SAVE GROUND-TRUTH METADATA
+# ============================================================
+
+metadata = {
+    "camera": {
+        "model": "Intel RealSense D455 (synthetic approximation)",
+        "width": WIDTH,
+        "height": HEIGHT,
+        "intrinsics": K.tolist(),
+        "camera_to_world_blender": camera_pose.tolist(),
+        "horizontal_fov_deg": HFOV_DEG,
+        "vertical_fov_deg": VFOV_DEG,
+        "physical_calibration_performed": False
+    },
+    "target": {
+        "name": "horizontal_extrusion",
+        "category_id": 4,
+        "object_to_world": np.asarray(
+            horizontal_extrusion.get_local2world_mat()
+        ).tolist(),
+        "geometry": "rectangular extrusion body",
+        "half_extents_m": [0.65, 0.04, 0.04]
+    }
+}
+
+metadata_path = "outputs/manufacturing_scene/ground_truth.json"
+
+with open(metadata_path, "w") as f:
+    json.dump(metadata, f, indent=4)
+
+print("\nGround-truth metadata saved to:", metadata_path)
