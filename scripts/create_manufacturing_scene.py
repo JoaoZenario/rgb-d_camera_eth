@@ -216,6 +216,11 @@ light.set_color([1.0, 1.0, 1.0])
 
 bproc.camera.set_resolution(640, 480)
 
+print(
+    "Camera intrinsic matrix:\n",
+    bproc.camera.get_intrinsics_as_K_matrix()
+)
+
 camera_pose = bproc.math.build_transformation_mat(
     [1.5, -2.0, 1.4],
     [1.15, 0.0, 0.65]

@@ -1,0 +1,8 @@
+Metric,Value
+Ideal profile points,21620
+Corrupted profile points,20808
+Point cloud completeness (%),96.24421831637373
+Centroid displacement X (mm),0.83741546
+Centroid displacement Y (mm),-1.4428484
+Centroid displacement Z (mm),-2.033949
+3D grasp proxy displacement (mm),2.630594
