@@ -1,4 +1,3 @@
-
 import os
 import glob
 import re
@@ -8,7 +7,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from src.sensor.depth_noise import apply_depth_noise
-
 
 # --------------------------------------------------
 # 1. Load ideal BlenderProc output

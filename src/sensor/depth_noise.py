@@ -1,38 +1,21 @@
-
 import numpy as np
 
-
 def find_object_boundaries(segmentation):
-    """
-    Find pixels close to semantic class boundaries.
+    """Find and expand semantic boundaries by two pixels."""
+    edge_mask = np.zeros(segmentation.shape, dtype=bool)
 
-    The boundary is expanded by two pixels to model the
-    increased likelihood of stereo matching failures
-    around object edges.
-    """
-    boundaries = np.zeros(segmentation.shape, dtype=bool)
+    edge_mask[:, 1:] |= (
+        segmentation[:, 1:] != segmentation[:, :-1]
+    )
+    edge_mask[1:, :] |= (
+        segmentation[1:, :] != segmentation[:-1, :]
+    )
 
-    # Find horizontal class transitions
-    diff = segmentation[:, 1:] != segmentation[:, :-1]
-    boundaries[:, 1:] |= diff
-    boundaries[:, :-1] |= diff
-
-    # Find vertical class transitions
-    diff = segmentation[1:, :] != segmentation[:-1, :]
-    boundaries[1:, :] |= diff
-    boundaries[:-1, :] |= diff
-
-    # Expand the boundary region by two pixels
-    expanded = boundaries.copy()
+    # Expand the boundary region by two pixels.
+    expanded = edge_mask.copy()
 
     for _ in range(2):
-        padded = np.pad(
-            expanded,
-            pad_width=1,
-            mode="constant",
-            constant_values=False
-        )
-
+        padded = np.pad(expanded, 1, mode="constant")
         expanded = np.zeros_like(expanded)
 
         for dy in range(3):
@@ -45,72 +28,94 @@ def find_object_boundaries(segmentation):
     return expanded
 
 
-def apply_depth_noise(depth, segmentation, seed=42):
+def apply_depth_noise(
+    depth,
+    segmentation,
+    seed=42,
+    gaussian_noise=True,
+    range_missing=True,
+    boundary_failures=True,
+):
     """
-    Apply a phenomenological stereo depth sensor model.
+    Apply configurable phenomenological depth corruption.
 
     Parameters
     ----------
-    depth : np.ndarray
+    depth : ndarray
         Ideal depth map in metres.
-    segmentation : np.ndarray
-        Semantic class map.
+    segmentation : ndarray
+        Semantic segmentation map.
     seed : int
         Random seed for reproducibility.
+    gaussian_noise : bool
+        Enable range-dependent Gaussian measurement noise.
+    range_missing : bool
+        Enable range-dependent invalid measurements.
+    boundary_failures : bool
+        Enable additional invalid measurements near object boundaries.
 
     Returns
     -------
-    corrupted_depth : np.ndarray
-        Simulated sensor depth in metres. Invalid pixels
-        are represented by NaN.
-    invalid_mask : np.ndarray
-        Boolean mask of invalid depth measurements.
-    edge_mask : np.ndarray
-        Boolean mask of pixels near semantic boundaries.
+    corrupted_depth : ndarray
+        Corrupted depth map. Invalid measurements are NaN.
+    invalid_mask : ndarray
+        Pixels that were valid in the original map but invalidated.
+    edge_mask : ndarray
+        Expanded object-boundary mask.
     """
-
-    rng = np.random.default_rng(seed)
-
-    depth = np.asarray(depth, dtype=np.float32)
-    segmentation = np.asarray(segmentation)
 
     if depth.shape != segmentation.shape:
         raise ValueError(
-            "Depth and segmentation maps must have the same shape."
+            "Depth and segmentation must have the same shape."
         )
 
-    # Identify valid rendered depth measurements
-    valid = np.isfinite(depth) & (depth > 0) & (depth < 1000)
+    valid = (
+        np.isfinite(depth)
+        & (depth > 0)
+        & (depth < 1000)
+    )
+
+    edge_mask = find_object_boundaries(segmentation)
+
+    # Independent random streams make each effect reproducible.
+    rng_noise, rng_range, rng_boundary = [
+        np.random.default_rng(s)
+        for s in np.random.SeedSequence(seed).spawn(3)
+    ]
 
     corrupted_depth = np.full(depth.shape, np.nan, dtype=np.float32)
 
-    # Find object boundaries
-    edge_mask = find_object_boundaries(segmentation)
+    z = depth[valid].astype(np.float32)
+    noisy_z = z.copy()
 
-    z = depth[valid]
+    # 1. Range-dependent Gaussian noise.
+    if gaussian_noise:
+        sigma = 0.001 + 0.0015 * z**2
+        noisy_z += rng_noise.normal(0.0, sigma).astype(np.float32)
 
-    # 1. Range-dependent Gaussian depth noise
-    # sigma(z) = a + b * z^2
-    sigma = 0.001 + 0.0015 * z**2
+    # 2. Range-dependent missing measurements.
+    invalid = np.zeros(depth.shape, dtype=bool)
 
-    noisy_depth = z + rng.normal(0.0, sigma)
+    if range_missing:
+        p_range = 0.002 + 0.03 * (z / 6.0)**2
+        invalid[valid] |= (
+            rng_range.random(z.shape) < p_range
+        )
 
-    # 2. Range-dependent probability of invalid measurements
-    range_probability = 0.002 + 0.03 * (z / 6.0)**2
+    # 3. Additional missing measurements near boundaries.
+    if boundary_failures:
+        p_boundary = 0.15
+        boundary_valid = valid & edge_mask
 
-    # 3. Additional invalid measurements near object boundaries
-    probabilities = range_probability.copy()
-    probabilities += 0.15 * edge_mask[valid]
+        invalid[boundary_valid] |= (
+            rng_boundary.random(np.count_nonzero(boundary_valid))
+            < p_boundary
+        )
 
-    probabilities = np.clip(probabilities, 0.0, 1.0)
+    # Store noisy values only where measurements remain valid.
+    keep = valid & ~invalid
+    corrupted_depth[keep] = noisy_z[~invalid[valid]]
 
-    random_values = rng.random(z.shape)
-    invalid = random_values < probabilities
-
-    # Store valid noisy measurements
-    noisy_depth[invalid] = np.nan
-    corrupted_depth[valid] = noisy_depth
-
-    invalid_mask = ~np.isfinite(corrupted_depth)
+    invalid_mask = valid & invalid
 
     return corrupted_depth, invalid_mask, edge_mask

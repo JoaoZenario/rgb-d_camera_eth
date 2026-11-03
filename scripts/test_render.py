@@ -1,4 +1,3 @@
-
 import blenderproc as bproc
 import time
 import numpy as np

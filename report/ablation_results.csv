@@ -1,0 +1,6 @@
+Configuration,Remaining valid pixels,Newly invalid pixels,Invalid rate (%),MAE (mm),RMSE (mm),Bias (mm)
+Baseline,166904,0,0.0,0.0,0.0,0.0
+A: Gaussian,166904,0,0.0,9.469076,12.421282,-0.0029556851
+B: Range missing,165537,1367,0.819033696016872,0.0,0.0,0.0
+C: Boundary failures,165167,1737,1.0407180175430188,0.0,0.0,0.0
+D: Full model,163814,3090,1.8513636581507933,9.452009,12.39809,-0.0059370454
