@@ -1,31 +1,97 @@
+
 import numpy as np
 
-def find_object_boundaries(segmentation):
-    """Find and expand semantic boundaries by two pixels."""
-    edge_mask = np.zeros(segmentation.shape, dtype=bool)
 
-    edge_mask[:, 1:] |= (
+# Nominal D455-inspired camera parameters.
+# These are simulation inputs, not physical calibration results.
+DEFAULT_FOCAL_LENGTH_PX = 343.1579872078984
+DEFAULT_BASELINE_M = 0.095
+
+# Explicit phenomenological assumptions, not measured D455 parameters.
+DEFAULT_DISPARITY_SIGMA_PX = 0.06
+DEFAULT_DISPARITY_QUANTIZATION_PX = 1.0 / 32.0
+
+DEFAULT_BOUNDARY_PROBABILITY = 0.05
+DEFAULT_DEPTH_DISCONTINUITY_M = 0.05
+
+
+def find_object_boundaries(
+    segmentation,
+    depth=None,
+    min_depth_jump_m=DEFAULT_DEPTH_DISCONTINUITY_M,
+):
+    """
+    Identify thin boundaries at sufficiently large depth discontinuities.
+
+    If depth is provided, semantic transitions are retained only where
+    adjacent valid depth measurements differ by at least min_depth_jump_m.
+
+    Both pixels on either side of a qualifying transition are marked.
+    No morphological expansion is applied.
+    """
+
+    height, width = segmentation.shape
+    edge_mask = np.zeros((height, width), dtype=bool)
+
+    valid = None
+
+    if depth is not None:
+        if depth.shape != segmentation.shape:
+            raise ValueError(
+                "Depth and segmentation must have the same shape."
+            )
+
+        valid = (
+            np.isfinite(depth)
+            & (depth > 0)
+            & (depth < 1000)
+        )
+
+    # Horizontal transitions: mark both adjacent pixels.
+    horizontal_transition = (
         segmentation[:, 1:] != segmentation[:, :-1]
     )
-    edge_mask[1:, :] |= (
+
+    if depth is not None:
+        horizontal_valid = (
+            valid[:, 1:] & valid[:, :-1]
+        )
+
+        horizontal_jump = np.abs(
+            depth[:, 1:] - depth[:, :-1]
+        )
+
+        horizontal_transition &= (
+            horizontal_valid
+            & (horizontal_jump >= min_depth_jump_m)
+        )
+
+    edge_mask[:, 1:] |= horizontal_transition
+    edge_mask[:, :-1] |= horizontal_transition
+
+    # Vertical transitions: mark both adjacent pixels.
+    vertical_transition = (
         segmentation[1:, :] != segmentation[:-1, :]
     )
 
-    # Expand the boundary region by two pixels.
-    expanded = edge_mask.copy()
+    if depth is not None:
+        vertical_valid = (
+            valid[1:, :] & valid[:-1, :]
+        )
 
-    for _ in range(2):
-        padded = np.pad(expanded, 1, mode="constant")
-        expanded = np.zeros_like(expanded)
+        vertical_jump = np.abs(
+            depth[1:, :] - depth[:-1, :]
+        )
 
-        for dy in range(3):
-            for dx in range(3):
-                expanded |= padded[
-                    dy:dy + segmentation.shape[0],
-                    dx:dx + segmentation.shape[1]
-                ]
+        vertical_transition &= (
+            vertical_valid
+            & (vertical_jump >= min_depth_jump_m)
+        )
 
-    return expanded
+    edge_mask[1:, :] |= vertical_transition
+    edge_mask[:-1, :] |= vertical_transition
+
+    return edge_mask
 
 
 def apply_depth_noise(
@@ -35,38 +101,77 @@ def apply_depth_noise(
     gaussian_noise=True,
     range_missing=True,
     boundary_failures=True,
+    focal_length_px=DEFAULT_FOCAL_LENGTH_PX,
+    baseline_m=DEFAULT_BASELINE_M,
+    disparity_sigma_px=DEFAULT_DISPARITY_SIGMA_PX,
+    disparity_quantization_px=DEFAULT_DISPARITY_QUANTIZATION_PX,
+    boundary_probability=DEFAULT_BOUNDARY_PROBABILITY,
+    depth_discontinuity_threshold_m=DEFAULT_DEPTH_DISCONTINUITY_M,
 ):
     """
-    Apply configurable phenomenological depth corruption.
+    Apply configurable phenomenological stereo-depth corruption.
 
     Parameters
     ----------
     depth : ndarray
-        Ideal depth map in metres.
+        Ideal axial depth map in metres.
     segmentation : ndarray
         Semantic segmentation map.
     seed : int
         Random seed for reproducibility.
     gaussian_noise : bool
-        Enable range-dependent Gaussian measurement noise.
+        Enable Gaussian disparity noise and disparity quantisation.
     range_missing : bool
         Enable range-dependent invalid measurements.
     boundary_failures : bool
-        Enable additional invalid measurements near object boundaries.
+        Enable additional invalid measurements near large depth jumps.
+    focal_length_px : float
+        Horizontal focal length in pixels.
+    baseline_m : float
+        Stereo baseline in metres.
+    disparity_sigma_px : float
+        Assumed standard deviation of disparity noise in pixels.
+    disparity_quantization_px : float
+        Assumed disparity quantisation interval in pixels.
+    boundary_probability : float
+        Assumed probability of invalid depth at qualifying boundaries.
+    depth_discontinuity_threshold_m : float
+        Minimum adjacent depth difference for a boundary to qualify.
 
     Returns
     -------
     corrupted_depth : ndarray
         Corrupted depth map. Invalid measurements are NaN.
     invalid_mask : ndarray
-        Pixels that were valid in the original map but invalidated.
+        Pixels valid in the original map but invalidated by corruption.
     edge_mask : ndarray
-        Expanded object-boundary mask.
+        Thin mask of semantic transitions with sufficiently large
+        depth discontinuities.
     """
 
     if depth.shape != segmentation.shape:
         raise ValueError(
             "Depth and segmentation must have the same shape."
+        )
+
+    if focal_length_px <= 0 or baseline_m <= 0:
+        raise ValueError(
+            "Focal length and baseline must be positive."
+        )
+
+    if disparity_sigma_px < 0:
+        raise ValueError(
+            "Disparity noise standard deviation cannot be negative."
+        )
+
+    if disparity_quantization_px <= 0:
+        raise ValueError(
+            "Disparity quantisation interval must be positive."
+        )
+
+    if not 0.0 <= boundary_probability <= 1.0:
+        raise ValueError(
+            "Boundary probability must be between 0 and 1."
         )
 
     valid = (
@@ -75,46 +180,102 @@ def apply_depth_noise(
         & (depth < 1000)
     )
 
-    edge_mask = find_object_boundaries(segmentation)
+    edge_mask = find_object_boundaries(
+        segmentation,
+        depth=depth,
+        min_depth_jump_m=depth_discontinuity_threshold_m,
+    )
 
-    # Independent random streams make each effect reproducible.
+    # Independent random streams ensure reproducible ablations.
     rng_noise, rng_range, rng_boundary = [
         np.random.default_rng(s)
         for s in np.random.SeedSequence(seed).spawn(3)
     ]
 
-    corrupted_depth = np.full(depth.shape, np.nan, dtype=np.float32)
+    corrupted_depth = np.full(
+        depth.shape,
+        np.nan,
+        dtype=np.float32,
+    )
 
-    z = depth[valid].astype(np.float32)
+    z = depth[valid].astype(np.float64)
+
+    # Start with ideal depth values.
     noisy_z = z.copy()
 
-    # 1. Range-dependent Gaussian noise.
+    # 1. Disparity-domain measurement noise.
     if gaussian_noise:
-        sigma = 0.001 + 0.0015 * z**2
-        noisy_z += rng_noise.normal(0.0, sigma).astype(np.float32)
+        disparity = (
+            focal_length_px * baseline_m / z
+        )
 
-    # 2. Range-dependent missing measurements.
+        noisy_disparity = (
+            disparity
+            + rng_noise.normal(
+                0.0,
+                disparity_sigma_px,
+                size=disparity.shape,
+            )
+        )
+
+        # Quantise disparity using the assumed subpixel interval.
+        noisy_disparity = (
+            np.round(
+                noisy_disparity / disparity_quantization_px
+            )
+            * disparity_quantization_px
+        )
+
+        # Non-positive disparity cannot produce a valid positive depth.
+        valid_disparity = noisy_disparity > 0
+
+        noisy_z[valid_disparity] = (
+            focal_length_px
+            * baseline_m
+            / noisy_disparity[valid_disparity]
+        )
+
+        noisy_z[~valid_disparity] = np.nan
+
+    # 2. Range-dependent invalid measurements.
     invalid = np.zeros(depth.shape, dtype=bool)
 
     if range_missing:
-        p_range = 0.002 + 0.03 * (z / 6.0)**2
+        p_range = (
+            0.002
+            + 0.03 * (z / 6.0) ** 2
+        )
+
+        p_range = np.clip(p_range, 0.0, 1.0)
+
         invalid[valid] |= (
             rng_range.random(z.shape) < p_range
         )
 
-    # 3. Additional missing measurements near boundaries.
-    if boundary_failures:
-        p_boundary = 0.15
+    # 3. Additional failures at large depth discontinuities.
+    if boundary_failures and boundary_probability > 0:
         boundary_valid = valid & edge_mask
 
-        invalid[boundary_valid] |= (
-            rng_boundary.random(np.count_nonzero(boundary_valid))
-            < p_boundary
-        )
+        n_boundary = np.count_nonzero(boundary_valid)
 
-    # Store noisy values only where measurements remain valid.
+        if n_boundary:
+            invalid[boundary_valid] |= (
+                rng_boundary.random(n_boundary)
+                < boundary_probability
+            )
+
+    # Invalid disparity values are also invalid measurements.
+    if gaussian_noise:
+        invalid_values = ~np.isfinite(noisy_z)
+
+        invalid[valid] |= invalid_values
+
+    # Assign noisy depths only to surviving valid pixels.
     keep = valid & ~invalid
-    corrupted_depth[keep] = noisy_z[~invalid[valid]]
+
+    corrupted_depth[keep] = noisy_z[~invalid[valid]].astype(
+        np.float32
+    )
 
     invalid_mask = valid & invalid
 

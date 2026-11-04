@@ -265,7 +265,35 @@ camera_pose = bproc.math.build_transformation_mat(
     rotation_matrix
 )
 
-bproc.camera.add_camera_pose(camera_pose)
+# ------------------------------------------------------------
+# Three-view geometric stereo audit
+# Frame 0: original camera
+# Frame 1: camera displaced +95 mm along local camera X
+# Frame 2: camera displaced -95 mm along local camera X
+# ------------------------------------------------------------
+
+STEREO_BASELINE_M = 0.095
+
+T_plus = np.eye(4)
+T_plus[0, 3] = STEREO_BASELINE_M
+
+T_minus = np.eye(4)
+T_minus[0, 3] = -STEREO_BASELINE_M
+
+camera_pose_plus = camera_pose @ T_plus
+camera_pose_minus = camera_pose @ T_minus
+
+camera_poses = {
+    "original": camera_pose,
+    "plus_x": camera_pose_plus,
+    "minus_x": camera_pose_minus,
+}
+
+# Register in the exact order used by the metadata.
+for view_name, pose in camera_poses.items():
+    bproc.camera.add_camera_pose(pose)
+    print(f"Registered camera view: {view_name}")
+    print(pose)
 
 print("\nCamera location:", camera_location)
 print("Camera look-at target:", look_at)
@@ -327,10 +355,12 @@ for key, frames in data.items():
 # 13. SAVE OUTPUTS
 # ============================================================
 
-os.makedirs("outputs/manufacturing_scene", exist_ok=True)
+STEREO_OUTPUT_DIR = "outputs/stereo_geometry"
+
+os.makedirs(STEREO_OUTPUT_DIR, exist_ok=True)
 
 bproc.writer.write_hdf5(
-    "outputs/manufacturing_scene",
+    STEREO_OUTPUT_DIR,
     data
 )
 
@@ -352,7 +382,31 @@ metadata = {
         "width": WIDTH,
         "height": HEIGHT,
         "intrinsics": K.tolist(),
+
+        # Original camera pose retained for compatibility.
         "camera_to_world_blender": camera_pose.tolist(),
+
+        # Explicit poses for the three rendered views.
+        "camera_poses": {
+            name: pose.tolist()
+            for name, pose in camera_poses.items()
+        },
+
+        "stereo_geometry": {
+            "nominal_baseline_m": STEREO_BASELINE_M,
+            "offset_axis": "local_camera_x",
+            "view_order": [
+                "original",
+                "plus_x",
+                "minus_x"
+            ],
+            "note": (
+                "Geometric sensitivity audit using virtual camera "
+                "displacements; not a calibrated reconstruction "
+                "of the physical D455 stereo pair."
+            )
+        },
+
         "horizontal_fov_deg": HFOV_DEG,
         "vertical_fov_deg": VFOV_DEG,
         "physical_calibration_performed": False
@@ -368,7 +422,10 @@ metadata = {
     }
 }
 
-metadata_path = "outputs/manufacturing_scene/ground_truth.json"
+metadata_path = os.path.join(
+    STEREO_OUTPUT_DIR,
+    "ground_truth.json"
+)
 
 with open(metadata_path, "w") as f:
     json.dump(metadata, f, indent=4)

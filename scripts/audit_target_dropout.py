@@ -26,7 +26,10 @@ valid = (
 
 target = (segmentation == TARGET_CATEGORY) & valid
 
-edges = find_object_boundaries(segmentation)
+edges = find_object_boundaries(
+    segmentation,
+    depth=depth,
+)
 
 target_count = np.count_nonzero(target)
 target_boundary = target & edges
@@ -34,7 +37,7 @@ target_boundary = target & edges
 print("========== TARGET BOUNDARY AUDIT ==========")
 print("Valid target pixels:", target_count)
 print(
-    "Target pixels in expanded boundary mask:",
+    "Target pixels in depth-discontinuity boundary mask:",
     np.count_nonzero(target_boundary)
 )
 print(
@@ -78,8 +81,25 @@ for name, settings in conditions.items():
             invalid & target
         )
 
+        boundary_invalid = np.count_nonzero(
+            invalid & target & edges
+        )
+
         rate = target_invalid / target_count * 100
+        boundary_rate = boundary_invalid / target_count * 100
+
         rates.append(rate)
+
+        if name == "boundary_only":
+            assert target_invalid == boundary_invalid, (
+                "Boundary-only dropout occurred outside the boundary mask."
+            )
+            print(
+                f"Seed {seed}: "
+                f"target invalid={target_invalid}, "
+                f"boundary invalid={boundary_invalid}, "
+                f"boundary dropout={boundary_rate:.2f}%"
+            )
 
     print(
         f"{name:18s} "
