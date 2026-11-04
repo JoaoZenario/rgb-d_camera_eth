@@ -1,0 +1,42 @@
+{
+  "ideal": {
+    "trials": 200,
+    "valid_estimates": 200,
+    "estimation_failures": 0,
+    "grasp_successes": 36,
+    "grasp_success_rate_pct": 18.0,
+    "mean_invalid_target_rate_pct": 0.0,
+    "translation_error_mm": {
+      "mean": 17.978132911810988,
+      "median": 8.423801051890909,
+      "std": 54.226138027651785,
+      "p95": 23.051452307462032
+    },
+    "long_axis_error_deg": {
+      "mean": 0.6522524588976347,
+      "median": 0.4323991102118911,
+      "std": 1.030013612432802,
+      "p95": 1.573007717668232
+    }
+  },
+  "full_corruption": {
+    "trials": 1000,
+    "valid_estimates": 1000,
+    "estimation_failures": 0,
+    "grasp_successes": 4,
+    "grasp_success_rate_pct": 0.4,
+    "mean_invalid_target_rate_pct": 0.8793929146801277,
+    "translation_error_mm": {
+      "mean": 20.25770142938888,
+      "median": 11.553656691713641,
+      "std": 53.60715144314416,
+      "p95": 25.502886938770754
+    },
+    "long_axis_error_deg": {
+      "mean": 0.6508211474817258,
+      "median": 0.4264954907227823,
+      "std": 1.027310943225643,
+      "p95": 1.5878247679881152
+    }
+  }
+}

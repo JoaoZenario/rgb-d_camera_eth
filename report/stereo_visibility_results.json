@@ -1,0 +1,270 @@
+{
+    "plus_x": {
+        "2_mm": {
+            "target": {
+                "total_source_points": 3879,
+                "counts": {
+                    "visible_consistent": 3862,
+                    "occluded_same_category": 0,
+                    "occluded_cross_category": 1,
+                    "ambiguous_boundary": 16,
+                    "outside_fov": 0,
+                    "no_destination_depth": 0,
+                    "farther_mismatch": 0
+                },
+                "percentages": {
+                    "visible_consistent": 99.56174271719516,
+                    "occluded_same_category": 0.0,
+                    "occluded_cross_category": 0.025779840164990978,
+                    "ambiguous_boundary": 0.41247744263985564,
+                    "outside_fov": 0.0,
+                    "no_destination_depth": 0.0,
+                    "farther_mismatch": 0.0
+                }
+            },
+            "whole_scene": {
+                "total_source_points": 101523,
+                "counts": {
+                    "visible_consistent": 101162,
+                    "occluded_same_category": 12,
+                    "occluded_cross_category": 240,
+                    "ambiguous_boundary": 109,
+                    "outside_fov": 0,
+                    "no_destination_depth": 0,
+                    "farther_mismatch": 0
+                },
+                "percentages": {
+                    "visible_consistent": 99.6444155511559,
+                    "occluded_same_category": 0.011819981679028398,
+                    "occluded_cross_category": 0.23639963358056795,
+                    "ambiguous_boundary": 0.10736483358450795,
+                    "outside_fov": 0.0,
+                    "no_destination_depth": 0.0,
+                    "farther_mismatch": 0.0
+                }
+            }
+        },
+        "5_mm": {
+            "target": {
+                "total_source_points": 3879,
+                "counts": {
+                    "visible_consistent": 3876,
+                    "occluded_same_category": 0,
+                    "occluded_cross_category": 1,
+                    "ambiguous_boundary": 2,
+                    "outside_fov": 0,
+                    "no_destination_depth": 0,
+                    "farther_mismatch": 0
+                },
+                "percentages": {
+                    "visible_consistent": 99.92266047950503,
+                    "occluded_same_category": 0.0,
+                    "occluded_cross_category": 0.025779840164990978,
+                    "ambiguous_boundary": 0.051559680329981955,
+                    "outside_fov": 0.0,
+                    "no_destination_depth": 0.0,
+                    "farther_mismatch": 0.0
+                }
+            },
+            "whole_scene": {
+                "total_source_points": 101523,
+                "counts": {
+                    "visible_consistent": 101270,
+                    "occluded_same_category": 0,
+                    "occluded_cross_category": 239,
+                    "ambiguous_boundary": 14,
+                    "outside_fov": 0,
+                    "no_destination_depth": 0,
+                    "farther_mismatch": 0
+                },
+                "percentages": {
+                    "visible_consistent": 99.75079538626716,
+                    "occluded_same_category": 0.0,
+                    "occluded_cross_category": 0.23541463510731558,
+                    "ambiguous_boundary": 0.01378997862553313,
+                    "outside_fov": 0.0,
+                    "no_destination_depth": 0.0,
+                    "farther_mismatch": 0.0
+                }
+            }
+        },
+        "10_mm": {
+            "target": {
+                "total_source_points": 3879,
+                "counts": {
+                    "visible_consistent": 3878,
+                    "occluded_same_category": 0,
+                    "occluded_cross_category": 1,
+                    "ambiguous_boundary": 0,
+                    "outside_fov": 0,
+                    "no_destination_depth": 0,
+                    "farther_mismatch": 0
+                },
+                "percentages": {
+                    "visible_consistent": 99.97422015983501,
+                    "occluded_same_category": 0.0,
+                    "occluded_cross_category": 0.025779840164990978,
+                    "ambiguous_boundary": 0.0,
+                    "outside_fov": 0.0,
+                    "no_destination_depth": 0.0,
+                    "farther_mismatch": 0.0
+                }
+            },
+            "whole_scene": {
+                "total_source_points": 101523,
+                "counts": {
+                    "visible_consistent": 101277,
+                    "occluded_same_category": 0,
+                    "occluded_cross_category": 237,
+                    "ambiguous_boundary": 9,
+                    "outside_fov": 0,
+                    "no_destination_depth": 0,
+                    "farther_mismatch": 0
+                },
+                "percentages": {
+                    "visible_consistent": 99.75769037557991,
+                    "occluded_same_category": 0.0,
+                    "occluded_cross_category": 0.23344463816081085,
+                    "ambiguous_boundary": 0.008864986259271299,
+                    "outside_fov": 0.0,
+                    "no_destination_depth": 0.0,
+                    "farther_mismatch": 0.0
+                }
+            }
+        }
+    },
+    "minus_x": {
+        "2_mm": {
+            "target": {
+                "total_source_points": 3879,
+                "counts": {
+                    "visible_consistent": 3832,
+                    "occluded_same_category": 0,
+                    "occluded_cross_category": 0,
+                    "ambiguous_boundary": 47,
+                    "outside_fov": 0,
+                    "no_destination_depth": 0,
+                    "farther_mismatch": 0
+                },
+                "percentages": {
+                    "visible_consistent": 98.78834751224542,
+                    "occluded_same_category": 0.0,
+                    "occluded_cross_category": 0.0,
+                    "ambiguous_boundary": 1.211652487754576,
+                    "outside_fov": 0.0,
+                    "no_destination_depth": 0.0,
+                    "farther_mismatch": 0.0
+                }
+            },
+            "whole_scene": {
+                "total_source_points": 101523,
+                "counts": {
+                    "visible_consistent": 98378,
+                    "occluded_same_category": 13,
+                    "occluded_cross_category": 196,
+                    "ambiguous_boundary": 295,
+                    "outside_fov": 2641,
+                    "no_destination_depth": 0,
+                    "farther_mismatch": 0
+                },
+                "percentages": {
+                    "visible_consistent": 96.9021798016213,
+                    "occluded_same_category": 0.012804980152280763,
+                    "occluded_cross_category": 0.19305970075746381,
+                    "ambiguous_boundary": 0.2905745496094481,
+                    "outside_fov": 2.6013809678595,
+                    "no_destination_depth": 0.0,
+                    "farther_mismatch": 0.0
+                }
+            }
+        },
+        "5_mm": {
+            "target": {
+                "total_source_points": 3879,
+                "counts": {
+                    "visible_consistent": 3862,
+                    "occluded_same_category": 0,
+                    "occluded_cross_category": 0,
+                    "ambiguous_boundary": 17,
+                    "outside_fov": 0,
+                    "no_destination_depth": 0,
+                    "farther_mismatch": 0
+                },
+                "percentages": {
+                    "visible_consistent": 99.56174271719516,
+                    "occluded_same_category": 0.0,
+                    "occluded_cross_category": 0.0,
+                    "ambiguous_boundary": 0.4382572828048466,
+                    "outside_fov": 0.0,
+                    "no_destination_depth": 0.0,
+                    "farther_mismatch": 0.0
+                }
+            },
+            "whole_scene": {
+                "total_source_points": 101523,
+                "counts": {
+                    "visible_consistent": 98528,
+                    "occluded_same_category": 0,
+                    "occluded_cross_category": 196,
+                    "ambiguous_boundary": 158,
+                    "outside_fov": 2641,
+                    "no_destination_depth": 0,
+                    "farther_mismatch": 0
+                },
+                "percentages": {
+                    "visible_consistent": 97.04992957260916,
+                    "occluded_same_category": 0.0,
+                    "occluded_cross_category": 0.19305970075746381,
+                    "ambiguous_boundary": 0.1556297587738739,
+                    "outside_fov": 2.6013809678595,
+                    "no_destination_depth": 0.0,
+                    "farther_mismatch": 0.0
+                }
+            }
+        },
+        "10_mm": {
+            "target": {
+                "total_source_points": 3879,
+                "counts": {
+                    "visible_consistent": 3875,
+                    "occluded_same_category": 0,
+                    "occluded_cross_category": 0,
+                    "ambiguous_boundary": 4,
+                    "outside_fov": 0,
+                    "no_destination_depth": 0,
+                    "farther_mismatch": 0
+                },
+                "percentages": {
+                    "visible_consistent": 99.89688063934004,
+                    "occluded_same_category": 0.0,
+                    "occluded_cross_category": 0.0,
+                    "ambiguous_boundary": 0.10311936065996391,
+                    "outside_fov": 0.0,
+                    "no_destination_depth": 0.0,
+                    "farther_mismatch": 0.0
+                }
+            },
+            "whole_scene": {
+                "total_source_points": 101523,
+                "counts": {
+                    "visible_consistent": 98595,
+                    "occluded_same_category": 0,
+                    "occluded_cross_category": 193,
+                    "ambiguous_boundary": 94,
+                    "outside_fov": 2641,
+                    "no_destination_depth": 0,
+                    "farther_mismatch": 0
+                },
+                "percentages": {
+                    "visible_consistent": 97.11592447031707,
+                    "occluded_same_category": 0.0,
+                    "occluded_cross_category": 0.19010470533770674,
+                    "ambiguous_boundary": 0.09258985648572245,
+                    "outside_fov": 2.6013809678595,
+                    "no_destination_depth": 0.0,
+                    "farther_mismatch": 0.0
+                }
+            }
+        }
+    }
+}
