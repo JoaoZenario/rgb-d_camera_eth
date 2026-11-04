@@ -1,6 +1,4 @@
-
 import numpy as np
-
 
 # Nominal D455-inspired camera parameters.
 # These are simulation inputs, not physical calibration results.

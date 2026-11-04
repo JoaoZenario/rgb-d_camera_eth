@@ -6,7 +6,6 @@ import numpy as np
 from pathlib import Path
 from src.sensor.depth_noise import apply_depth_noise
 
-
 HDF5_PATH = "outputs/manufacturing_scene/0.hdf5"
 META_PATH = "outputs/manufacturing_scene/ground_truth.json"
 

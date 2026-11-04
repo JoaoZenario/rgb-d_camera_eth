@@ -1,10 +1,9 @@
 import os
-
 import h5py
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation, PillowWriter
 
+from matplotlib.animation import FuncAnimation, PillowWriter
 from src.sensor.depth_noise import apply_depth_noise
 
 # ============================================================

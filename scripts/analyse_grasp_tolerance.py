@@ -1,9 +1,9 @@
 import csv
 import json
+import numpy as np
+
 from collections import defaultdict
 from pathlib import Path
-
-import numpy as np
 
 INPUT = Path("outputs/randomized_pose_ablation/trial_results.csv")
 OUTPUT = Path("outputs/randomized_pose_ablation")

@@ -1,4 +1,3 @@
-
 import csv
 import json
 import h5py
@@ -7,9 +6,7 @@ import open3d as o3d
 
 from pathlib import Path
 from scipy.spatial import cKDTree
-
 from src.sensor.depth_noise import apply_depth_noise
-
 
 # ============================================================
 # CONFIGURATION

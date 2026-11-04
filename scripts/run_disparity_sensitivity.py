@@ -7,7 +7,6 @@ from pathlib import Path
 from scripts.run_obb_percentile_sweep import estimate_obb
 from src.sensor.depth_noise import apply_depth_noise
 
-
 HDF5_PATH = "outputs/manufacturing_scene/0.hdf5"
 META_PATH = "outputs/manufacturing_scene/ground_truth.json"
 

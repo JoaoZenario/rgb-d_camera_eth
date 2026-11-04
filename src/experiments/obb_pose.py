@@ -1,8 +1,6 @@
 import numpy as np
 
-
 CV_TO_BLENDER = np.diag([1.0, -1.0, -1.0, 1.0])
-
 
 def estimate_obb_pose(
     depth,

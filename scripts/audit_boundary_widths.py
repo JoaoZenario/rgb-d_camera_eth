@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 INPUT_FILE = "outputs/manufacturing_scene/0.hdf5"
 TARGET_CATEGORY = 4
 
-
 def dilate(mask, radius):
     """Square/Chebyshev dilation by the specified pixel radius."""
     if radius == 0:

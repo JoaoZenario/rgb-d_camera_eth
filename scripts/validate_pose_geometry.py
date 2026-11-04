@@ -1,10 +1,8 @@
 import glob
 import json
 import os
-
 import h5py
 import numpy as np
-
 
 ROOT = "outputs/randomized_pose_dataset"
 TARGET_CATEGORY = 4

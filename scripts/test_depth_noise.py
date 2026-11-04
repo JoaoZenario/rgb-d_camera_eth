@@ -1,7 +1,6 @@
 import os
 import glob
 import re
-
 import h5py
 import numpy as np
 import matplotlib.pyplot as plt

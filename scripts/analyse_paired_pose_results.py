@@ -1,6 +1,6 @@
-
 import csv
 import numpy as np
+
 from collections import defaultdict
 
 PATH = "outputs/paired_pose_experiment/per_trial_results.csv"

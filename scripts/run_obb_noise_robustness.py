@@ -4,9 +4,7 @@ import h5py
 import numpy as np
 
 from pathlib import Path
-
 from src.sensor.depth_noise import apply_depth_noise
-
 
 # ------------------------------------------------------------
 # CONFIGURATION
