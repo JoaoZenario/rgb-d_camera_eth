@@ -1,0 +1,62 @@
+{
+  "ideal": {
+    "trials": 200,
+    "successful_estimates": 137,
+    "estimation_failure_rate": 0.31499999999999995,
+    "translation_median_mm": 2.46498442846603,
+    "translation_mean_mm": 2.7700963833474774,
+    "translation_p95_mm": 7.272955622536751,
+    "axis_median_deg": 1.2045964958758826,
+    "axis_mean_deg": 1.100847024782424,
+    "axis_p95_deg": 2.106119535177151,
+    "success_5mm_5deg": 120,
+    "success_5mm_5deg_fraction": 0.6,
+    "success_10mm_5deg": 137,
+    "success_10mm_5deg_fraction": 0.685
+  },
+  "disparity": {
+    "trials": 600,
+    "successful_estimates": 413,
+    "estimation_failure_rate": 0.31166666666666665,
+    "translation_median_mm": 2.2662122873386483,
+    "translation_mean_mm": 2.839403937929279,
+    "translation_p95_mm": 7.548683039647325,
+    "axis_median_deg": 1.156094882845945,
+    "axis_mean_deg": 1.0762805322979214,
+    "axis_p95_deg": 2.0761585340309674,
+    "success_5mm_5deg": 350,
+    "success_5mm_5deg_fraction": 0.5833333333333334,
+    "success_10mm_5deg": 402,
+    "success_10mm_5deg_fraction": 0.67
+  },
+  "dropout": {
+    "trials": 600,
+    "successful_estimates": 408,
+    "estimation_failure_rate": 0.31999999999999995,
+    "translation_median_mm": 2.230133877600392,
+    "translation_mean_mm": 2.627220548521409,
+    "translation_p95_mm": 6.743612790411749,
+    "axis_median_deg": 1.18801915036408,
+    "axis_mean_deg": 1.1034497374249133,
+    "axis_p95_deg": 2.132711295764577,
+    "success_5mm_5deg": 366,
+    "success_5mm_5deg_fraction": 0.61,
+    "success_10mm_5deg": 406,
+    "success_10mm_5deg_fraction": 0.6766666666666666
+  },
+  "full": {
+    "trials": 600,
+    "successful_estimates": 412,
+    "estimation_failure_rate": 0.31333333333333335,
+    "translation_median_mm": 2.243386249886182,
+    "translation_mean_mm": 2.812180055589688,
+    "translation_p95_mm": 7.218291028994185,
+    "axis_median_deg": 1.1464215726376104,
+    "axis_mean_deg": 1.0731331606469896,
+    "axis_p95_deg": 2.0828284852145127,
+    "success_5mm_5deg": 349,
+    "success_5mm_5deg_fraction": 0.5816666666666667,
+    "success_10mm_5deg": 402,
+    "success_10mm_5deg_fraction": 0.67
+  }
+}

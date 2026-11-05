@@ -12,7 +12,6 @@ from src.experiments.obb_pose import (
     evaluate_pose,
 )
 
-
 DATASET_DIR = Path("outputs/randomized_pose_dataset")
 OUTPUT_DIR = Path("outputs/randomized_pose_experiment")
 

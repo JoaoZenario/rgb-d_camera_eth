@@ -6,7 +6,6 @@ import open3d as o3d
 from pathlib import Path
 from scipy.spatial import cKDTree
 
-
 # ============================================================
 # CONFIGURATION
 # ============================================================

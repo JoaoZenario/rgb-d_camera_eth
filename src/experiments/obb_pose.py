@@ -83,14 +83,33 @@ def evaluate_pose(estimate, T_target_gt):
     R_gt = T_target_gt[:3, :3]
     t_gt = T_target_gt[:3, 3]
 
+    t_est = np.asarray(estimate["centre_world"], dtype=float)
+    gt_axis = np.asarray(R_gt[:, 0], dtype=float)
+    gt_axis /= np.linalg.norm(gt_axis)
+
+    translation_delta = t_est - t_gt
+
+    along_axis_error_mm = abs(
+        np.dot(translation_delta, gt_axis)
+    ) * 1000.0
+
+    cross_axis_delta = (
+        translation_delta
+        - np.dot(translation_delta, gt_axis) * gt_axis
+    )
+
+    cross_axis_error_mm = (
+        np.linalg.norm(cross_axis_delta) * 1000.0
+    )
+
     translation_error_mm = (
-        np.linalg.norm(estimate["centre_world"] - t_gt) * 1000.0
+        np.linalg.norm(translation_delta) * 1000.0
     )
 
     axis_cosine = np.clip(
         abs(np.dot(
             estimate["long_axis_world"],
-            R_gt[:, 0]
+            gt_axis
         )),
         0.0,
         1.0,
@@ -100,5 +119,7 @@ def evaluate_pose(estimate, T_target_gt):
 
     return {
         "translation_error_mm": float(translation_error_mm),
+        "along_axis_error_mm": float(along_axis_error_mm),
+        "cross_axis_error_mm": float(cross_axis_error_mm),
         "long_axis_error_deg": float(axis_error_deg),
     }

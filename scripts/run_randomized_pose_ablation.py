@@ -248,6 +248,8 @@ def main():
                     **visibility,
                     "estimator_valid": False,
                     "translation_error_mm": "",
+                    "along_axis_error_mm": "",
+                    "cross_axis_error_mm": "",
                     "long_axis_error_deg": "",
                     "grasp_success": False,
                     "error_message": "",
@@ -261,6 +263,12 @@ def main():
                     record["estimator_valid"] = True
                     record["translation_error_mm"] = errors[
                         "translation_error_mm"
+                    ]
+                    record["along_axis_error_mm"] = errors[
+                        "along_axis_error_mm"
+                    ]
+                    record["cross_axis_error_mm"] = errors[
+                        "cross_axis_error_mm"
                     ]
                     record["long_axis_error_deg"] = errors[
                         "long_axis_error_deg"
@@ -279,6 +287,8 @@ def main():
                         condition, []
                     ).append({
                         "translation": record["translation_error_mm"],
+                        "along": record["along_axis_error_mm"],
+                        "cross": record["cross_axis_error_mm"],
                         "axis": record["long_axis_error_deg"],
                         "success": record["grasp_success"],
                     })
@@ -315,6 +325,8 @@ def main():
         valid = [r for r in subset if r["estimator_valid"]]
 
         translations = [float(r["translation_error_mm"]) for r in valid]
+        along_errors = [float(r["along_axis_error_mm"]) for r in valid]
+        cross_errors = [float(r["cross_axis_error_mm"]) for r in valid]
         axes = [float(r["long_axis_error_deg"]) for r in valid]
 
         summary["conditions"][condition] = {
@@ -331,6 +343,8 @@ def main():
                 if subset else None
             ),
             "translation_error_mm": summarize(translations),
+            "along_axis_error_mm": summarize(along_errors),
+            "cross_axis_error_mm": summarize(cross_errors),
             "long_axis_error_deg": summarize(axes),
         }
 
@@ -343,6 +357,8 @@ def main():
 
     for condition in ["disparity_only", "dropout_only", "full_corruption"]:
         paired_translation_delta = []
+        paired_along_delta = []
+        paired_cross_delta = []
         paired_axis_delta = []
         paired_success_delta = []
 
@@ -355,6 +371,16 @@ def main():
             paired_translation_delta.append(
                 np.mean([x["translation"] for x in corrupted])
                 - ideal["translation"]
+            )
+
+            paired_along_delta.append(
+                np.mean([x["along"] for x in corrupted])
+                - ideal["along"]
+            )
+
+            paired_cross_delta.append(
+                np.mean([x["cross"] for x in corrupted])
+                - ideal["cross"]
             )
 
             paired_axis_delta.append(
@@ -372,6 +398,14 @@ def main():
             "translation_delta_mm": summarize(paired_translation_delta),
             "translation_delta_bootstrap_95_ci_mm": bootstrap_ci(
                 paired_translation_delta, seed=BASE_SEED + 1
+            ),
+            "along_axis_delta_mm": summarize(paired_along_delta),
+            "along_axis_delta_bootstrap_95_ci_mm": bootstrap_ci(
+                paired_along_delta, seed=BASE_SEED + 4
+            ),
+            "cross_axis_delta_mm": summarize(paired_cross_delta),
+            "cross_axis_delta_bootstrap_95_ci_mm": bootstrap_ci(
+                paired_cross_delta, seed=BASE_SEED + 5
             ),
             "axis_delta_deg": summarize(paired_axis_delta),
             "axis_delta_bootstrap_95_ci_deg": bootstrap_ci(

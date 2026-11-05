@@ -1,0 +1,194 @@
+{
+  "bootstrap_repetitions": 10000,
+  "bootstrap_seed": 20261105,
+  "independent_sampling_unit": "sample_id (pose)",
+  "repeated_trials_aggregated_within_pose": true,
+  "geometric_success_definition": "translation and axis errors within explicit tolerances; failed estimates count as unsuccessful",
+  "geometric_tolerances": {
+    "strict": {
+      "translation_mm": 5.0,
+      "axis_deg": 5.0
+    },
+    "relaxed": {
+      "translation_mm": 10.0,
+      "axis_deg": 5.0
+    }
+  },
+  "conditional_error_comparison": "paired poses with valid estimates in both conditions",
+  "summary": [
+    {
+      "condition": "ideal",
+      "num_poses": 200,
+      "trials": 200,
+      "coverage": 0.685,
+      "geometric_success_5mm_5deg_rate": 0.6,
+      "geometric_success_10mm_5deg_rate": 0.685,
+      "valid_estimates": 137,
+      "translation_median_mm": 2.46498442846603,
+      "translation_p95_mm": 7.272955622536751,
+      "axis_median_deg": 1.2045964958758826,
+      "axis_p95_deg": 2.106119535177151
+    },
+    {
+      "condition": "disparity",
+      "num_poses": 200,
+      "trials": 600,
+      "coverage": 0.6883333333333332,
+      "geometric_success_5mm_5deg_rate": 0.5833333333333333,
+      "geometric_success_10mm_5deg_rate": 0.67,
+      "valid_estimates": 413,
+      "translation_median_mm": 2.2662122873386483,
+      "translation_p95_mm": 7.548683039647325,
+      "axis_median_deg": 1.156094882845945,
+      "axis_p95_deg": 2.0761585340309674
+    },
+    {
+      "condition": "dropout",
+      "num_poses": 200,
+      "trials": 600,
+      "coverage": 0.68,
+      "geometric_success_5mm_5deg_rate": 0.61,
+      "geometric_success_10mm_5deg_rate": 0.6766666666666665,
+      "valid_estimates": 408,
+      "translation_median_mm": 2.230133877600392,
+      "translation_p95_mm": 6.743612790411749,
+      "axis_median_deg": 1.18801915036408,
+      "axis_p95_deg": 2.132711295764577
+    },
+    {
+      "condition": "full",
+      "num_poses": 200,
+      "trials": 600,
+      "coverage": 0.6866666666666668,
+      "geometric_success_5mm_5deg_rate": 0.5816666666666667,
+      "geometric_success_10mm_5deg_rate": 0.67,
+      "valid_estimates": 412,
+      "translation_median_mm": 2.243386249886182,
+      "translation_p95_mm": 7.218291028994185,
+      "axis_median_deg": 1.1464215726376108,
+      "axis_p95_deg": 2.0828284852145127
+    }
+  ],
+  "paired_comparisons": [
+    {
+      "condition": "disparity",
+      "metric": "coverage",
+      "paired_poses": 200,
+      "paired_delta_condition_minus_ideal": 0.003333333333333333,
+      "ci_lower_95": 0.0,
+      "ci_upper_95": 0.008333333333333333
+    },
+    {
+      "condition": "disparity",
+      "metric": "geometric_success_5mm_5deg",
+      "paired_poses": 200,
+      "paired_delta_condition_minus_ideal": -0.016666666666666673,
+      "ci_lower_95": -0.05333333333333334,
+      "ci_upper_95": 0.02166666666666666
+    },
+    {
+      "condition": "disparity",
+      "metric": "geometric_success_10mm_5deg",
+      "paired_poses": 200,
+      "paired_delta_condition_minus_ideal": -0.015,
+      "ci_lower_95": -0.028333333333333335,
+      "ci_upper_95": -0.005
+    },
+    {
+      "condition": "disparity",
+      "metric": "translation_error_mm",
+      "paired_poses": 137,
+      "paired_delta_condition_minus_ideal": 0.0453379009095057,
+      "ci_lower_95": -0.25353185176251575,
+      "ci_upper_95": 0.3421537145971289
+    },
+    {
+      "condition": "disparity",
+      "metric": "axis_error_deg",
+      "paired_poses": 137,
+      "paired_delta_condition_minus_ideal": -0.02019994730662941,
+      "ci_lower_95": -0.03269470314279605,
+      "ci_upper_95": -0.007340111221298414
+    },
+    {
+      "condition": "dropout",
+      "metric": "coverage",
+      "paired_poses": 200,
+      "paired_delta_condition_minus_ideal": -0.005,
+      "ci_lower_95": -0.011666666666666667,
+      "ci_upper_95": 0.0
+    },
+    {
+      "condition": "dropout",
+      "metric": "geometric_success_5mm_5deg",
+      "paired_poses": 200,
+      "paired_delta_condition_minus_ideal": 0.009999999999999998,
+      "ci_lower_95": -0.0033333333333333344,
+      "ci_upper_95": 0.025
+    },
+    {
+      "condition": "dropout",
+      "metric": "geometric_success_10mm_5deg",
+      "paired_poses": 200,
+      "paired_delta_condition_minus_ideal": -0.008333333333333335,
+      "ci_lower_95": -0.018333333333333333,
+      "ci_upper_95": -0.0016666666666666668
+    },
+    {
+      "condition": "dropout",
+      "metric": "translation_error_mm",
+      "paired_poses": 137,
+      "paired_delta_condition_minus_ideal": -0.10527460723182733,
+      "ci_lower_95": -0.20051390891958273,
+      "ci_upper_95": -0.0064234617184302095
+    },
+    {
+      "condition": "dropout",
+      "metric": "axis_error_deg",
+      "paired_poses": 137,
+      "paired_delta_condition_minus_ideal": -0.003384913784676428,
+      "ci_lower_95": -0.007905583473367584,
+      "ci_upper_95": 0.001595008854767988
+    },
+    {
+      "condition": "full",
+      "metric": "coverage",
+      "paired_poses": 200,
+      "paired_delta_condition_minus_ideal": 0.0016666666666666663,
+      "ci_lower_95": -0.005,
+      "ci_upper_95": 0.01
+    },
+    {
+      "condition": "full",
+      "metric": "geometric_success_5mm_5deg",
+      "paired_poses": 200,
+      "paired_delta_condition_minus_ideal": -0.018333333333333344,
+      "ci_lower_95": -0.05333333333333334,
+      "ci_upper_95": 0.018333333333333323
+    },
+    {
+      "condition": "full",
+      "metric": "geometric_success_10mm_5deg",
+      "paired_poses": 200,
+      "paired_delta_condition_minus_ideal": -0.015,
+      "ci_lower_95": -0.02666666666666667,
+      "ci_upper_95": -0.005
+    },
+    {
+      "condition": "full",
+      "metric": "translation_error_mm",
+      "paired_poses": 137,
+      "paired_delta_condition_minus_ideal": 0.03276370320337879,
+      "ci_lower_95": -0.26717167296259225,
+      "ci_upper_95": 0.3200975287151552
+    },
+    {
+      "condition": "full",
+      "metric": "axis_error_deg",
+      "paired_poses": 137,
+      "paired_delta_condition_minus_ideal": -0.02559240031691229,
+      "ci_lower_95": -0.03859298502424498,
+      "ci_upper_95": -0.01253331977251424
+    }
+  ]
+}

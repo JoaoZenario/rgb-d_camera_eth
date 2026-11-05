@@ -1,5 +1,7 @@
 import numpy as np
 
+from scipy.ndimage import gaussian_filter
+
 # Nominal D455-inspired camera parameters.
 # These are simulation inputs, not physical calibration results.
 DEFAULT_FOCAL_LENGTH_PX = 343.1579872078984
@@ -8,6 +10,7 @@ DEFAULT_BASELINE_M = 0.095
 # Explicit phenomenological assumptions, not measured D455 parameters.
 DEFAULT_DISPARITY_SIGMA_PX = 0.06
 DEFAULT_DISPARITY_QUANTIZATION_PX = 1.0 / 32.0
+DEFAULT_CORRELATION_SIGMA_PX = 8.0
 
 DEFAULT_BOUNDARY_PROBABILITY = 0.05
 DEFAULT_DEPTH_DISCONTINUITY_M = 0.05
@@ -103,6 +106,8 @@ def apply_depth_noise(
     baseline_m=DEFAULT_BASELINE_M,
     disparity_sigma_px=DEFAULT_DISPARITY_SIGMA_PX,
     disparity_quantization_px=DEFAULT_DISPARITY_QUANTIZATION_PX,
+    disparity_noise_mode="independent",
+    correlation_sigma_px=DEFAULT_CORRELATION_SIGMA_PX,
     boundary_probability=DEFAULT_BOUNDARY_PROBABILITY,
     depth_discontinuity_threshold_m=DEFAULT_DEPTH_DISCONTINUITY_M,
 ):
@@ -131,6 +136,12 @@ def apply_depth_noise(
         Assumed standard deviation of disparity noise in pixels.
     disparity_quantization_px : float
         Assumed disparity quantisation interval in pixels.
+    disparity_noise_mode : str
+        "independent" preserves the original per-pixel Gaussian model.
+        "correlated" uses a spatially smoothed Gaussian random field.
+    correlation_sigma_px : float
+        Gaussian smoothing standard deviation in pixels for correlated
+        disparity noise. This is a phenomenological assumption.
     boundary_probability : float
         Assumed probability of invalid depth at qualifying boundaries.
     depth_discontinuity_threshold_m : float
@@ -165,6 +176,16 @@ def apply_depth_noise(
     if disparity_quantization_px <= 0:
         raise ValueError(
             "Disparity quantisation interval must be positive."
+        )
+
+    if disparity_noise_mode not in ("independent", "correlated"):
+        raise ValueError(
+            "disparity_noise_mode must be 'independent' or 'correlated'."
+        )
+
+    if correlation_sigma_px <= 0:
+        raise ValueError(
+            "Correlation sigma must be positive."
         )
 
     if not 0.0 <= boundary_probability <= 1.0:
@@ -207,14 +228,43 @@ def apply_depth_noise(
             focal_length_px * baseline_m / z
         )
 
-        noisy_disparity = (
-            disparity
-            + rng_noise.normal(
+        if disparity_noise_mode == "independent":
+            # Original model: independent Gaussian noise at each pixel.
+            disparity_noise = rng_noise.normal(
                 0.0,
                 disparity_sigma_px,
                 size=disparity.shape,
             )
-        )
+
+        else:
+            # Correlated model: smooth a white-noise field spatially.
+            # Normalisation preserves the marginal standard deviation
+            # over valid pixels before disparity quantisation.
+            white_noise = rng_noise.normal(size=depth.shape)
+
+            correlated_field = gaussian_filter(
+                white_noise,
+                sigma=correlation_sigma_px,
+                mode="reflect",
+            )
+
+            valid_field = correlated_field[valid]
+            field_std = valid_field.std()
+
+            if not np.isfinite(field_std) or field_std <= 0:
+                raise RuntimeError(
+                    "Could not normalise correlated disparity field."
+                )
+
+            correlated_field = (
+                correlated_field - valid_field.mean()
+            ) / field_std
+
+            disparity_noise = (
+                disparity_sigma_px * correlated_field[valid]
+            )
+
+        noisy_disparity = disparity + disparity_noise
 
         # Quantise disparity using the assumed subpixel interval.
         noisy_disparity = (
