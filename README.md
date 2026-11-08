@@ -44,3 +44,13 @@ BlenderProc scene generation
 
 ```bash
 blenderproc run scripts/create_manufacturing_scene.py
+```
+## Copyright and usage
+
+Copyright (c) 2026 João Zenário. All rights reserved.
+
+This repository is publicly available for academic review and evaluation purposes. No licence is granted for the reproduction, modification, redistribution, or commercial use of this source code or its associated materials without prior written permission from the copyright holder.
+
+Public availability on GitHub does not constitute a general grant of rights to reuse this work. GitHub's Terms of Service apply to viewing and forking the public repository.
+
+If you wish to use any part of this work beyond academic review and evaluation, please contact the copyright holder for permission.
