@@ -22,9 +22,28 @@ The reference RGB-D camera is the **Intel RealSense D455**. It was selected as a
 - The randomized dataset varies target yaw and horizontal position while keeping the camera fixed and target height constant.
 - The downstream estimators use ground-truth semantic segmentation and camera parameters. The CAD-informed estimator additionally uses assumed target dimensions.
 - The experiments evaluate geometric pose-estimation behaviour; they do not constitute autonomous robot grasping or physical manipulation trials.
-- The depth corruption model approximates selected effects (disparity perturbation and quantisation, range-dependent missing depth, boundary failures, and optional spatially correlated disparity noise). It does not reproduce the complete RealSense stereo-matching and post-processing pipeline.
+- The depth-corruption model approximates selected effects (disparity perturbation and quantisation, range-dependent missing depth, boundary failures, and optional spatially correlated disparity noise). It does not reproduce the complete RealSense stereo-matching and post-processing pipeline.
 
 These qualifications are intentional and should be considered when interpreting the results.
+
+## Quick check (about 2 minutes)
+
+A lightweight smoke test runs on the three bundled example frames without installing Blender, BlenderProc, or Open3D.
+
+Activate a Python 3 environment, or create the project virtual environment using the installation instructions below. Then install only the dependencies needed for this check:
+
+```bash
+python -m pip install numpy scipy h5py
+python -m scripts.demo_on_examples
+```
+
+The script applies the default depth-corruption model, runs the PCA-OBB pose estimator, and prints ideal-versus-corrupted pose errors for example frames 0, 100, and 199. It uses the provided ground-truth segmentation and camera metadata. This is a smoke test of the bundled examples, **not** a reproduction of the full 200-pose experiments or a test of physical-camera performance.
+
+To select other bundled samples, pass their IDs:
+
+```bash
+python -m scripts.demo_on_examples --samples 0 199
+```
 
 ## Software environment
 
@@ -57,7 +76,7 @@ On Windows, activate the environment with:
 
 Install Blender 4.2.1 LTS separately. BlenderProc 2.8.0 provides the `blenderproc` command used to run the rendering scripts. Depending on your system, its first run may need to download or configure a compatible Blender runtime.
 
-Run all commands below from the repository root.
+Run all commands below from the repository root, with the virtual environment activated.
 
 ## Repository structure
 
@@ -73,6 +92,20 @@ report/
 ```
 
 The full generated datasets and intermediate rendering outputs are not committed. They are written under `outputs/`, which is excluded by `.gitignore`. Three representative HDF5 frames and their pose metadata are provided under `examples/`.
+
+## Start here: main experiment scripts
+
+The following scripts reproduce the principal experiments discussed in the report:
+
+| Purpose | Script |
+|---|---|
+| Generate the randomized RGB-D dataset | `scripts/create_randomized_pose_dataset.py` |
+| Run the randomized OBB experiment | `scripts/run_randomized_pose_experiment.py` |
+| Run the OBB corruption ablation | `scripts/run_randomized_pose_ablation.py` |
+| Run the spatial-correlation sensitivity experiment | `scripts/run_correlation_scale_sweep.py` |
+| Run the CAD-informed end-face experiment | `scripts/run_cad_end_experiment.py` |
+
+Other scripts in `scripts/` provide diagnostics, validation, sensitivity analyses and plotting utilities.
 
 ## Reproducing the main experiments
 
