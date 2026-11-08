@@ -185,7 +185,7 @@ The examples are a small inspection subset, not the complete 200-frame dataset. 
 
 ## Report
 
-The final application report is distributed as a PDF at `report/report.pdf`. The LaTeX source and bibliography are not included in this repository.
+The final application report is distributed as a PDF at `report/report.pdf`.
 
 ## Copyright and usage
 
