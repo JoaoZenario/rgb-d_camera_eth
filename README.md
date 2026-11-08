@@ -70,7 +70,6 @@ examples/           # Small representative dataset subset
 results/            # Selected CSV/JSON experiment outputs
 report/
   figures/          # Figures used for analysis and reporting
-docs/               # Supporting project documentation
 ```
 
 The full generated datasets and intermediate rendering outputs are not committed. They are written under `outputs/`, which is excluded by `.gitignore`. Three representative HDF5 frames and their pose metadata are provided under `examples/`.
