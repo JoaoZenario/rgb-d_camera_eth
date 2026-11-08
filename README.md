@@ -91,7 +91,7 @@ report/
   figures/          # Figures used for analysis and reporting
 ```
 
-The full generated datasets and intermediate rendering outputs are not committed. They are written under `outputs/`, which is excluded by `.gitignore`. Three representative HDF5 frames and their pose metadata are provided under `examples/`.
+The full generated datasets and intermediate rendering outputs are not committed. They are written under `outputs/`, which is excluded by `.gitignore`. Three representative HDF5 frames and their pose metadata are provided under `examples/`. Selected experiment results are provided separately under `results/` for inspection.
 
 ## Start here: main experiment scripts
 
